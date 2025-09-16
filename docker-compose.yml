@@ -7,7 +7,8 @@ services:
     ports:
       - "8020:8020"   # noVNC 網頁
     volumes:
-      - ./work:/work  # 把錄製的檔案存到本機
+      - ./work:/work
+      - ./:/app # 把錄製的檔案存到本機
     networks:
       - ollama-network
     env_file:
