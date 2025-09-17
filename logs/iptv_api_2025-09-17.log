@@ -1,0 +1,70 @@
+2025-09-17 04:47:50 - iptv_api - INFO - iptv.py:12 - Starting download_schedule: 16/09/2025 to 17/09/2025, file: schedule.csv
+2025-09-17 04:48:20 - iptv_api - ERROR - iptv.py:52 - Error during download process: Page.goto: Timeout 30000ms exceeded.
+Call log:
+  - navigating to "https://inplayip.tv/login?redirectUrl=/schedule", waiting until "load"
+Traceback (most recent call last):
+  File "/app/script/iptv.py", line 24, in run
+    await page.goto("https://inplayip.tv/login?redirectUrl=/schedule")
+  File "/usr/local/lib/python3.12/site-packages/playwright/async_api/_generated.py", line 8992, in goto
+    await self._impl_obj.goto(
+  File "/usr/local/lib/python3.12/site-packages/playwright/_impl/_page.py", line 556, in goto
+    return await self._main_frame.goto(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/playwright/_impl/_frame.py", line 153, in goto
+    await self._channel.send(
+  File "/usr/local/lib/python3.12/site-packages/playwright/_impl/_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/playwright/_impl/_connection.py", line 558, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Page.goto: Timeout 30000ms exceeded.
+Call log:
+  - navigating to "https://inplayip.tv/login?redirectUrl=/schedule", waiting until "load"
+
+2025-09-17 07:09:53 - iptv_api - INFO - iptv.py:12 - Starting download_schedule: 16/09/2025 to 17/09/2025, file: schedule.csv
+2025-09-17 07:10:20 - iptv_api - INFO - iptv.py:49 - Download completed successfully: schedule.csv
+2025-09-17 07:11:10 - iptv_api - INFO - iptv.py:12 - Starting download_schedule: 16/09/2025 to 17/09/2025, file: schedule.csv
+2025-09-17 07:11:32 - iptv_api - INFO - iptv.py:49 - Download completed successfully: schedule.csv
+2025-09-17 07:11:32 - iptv_api - INFO - processing.py:9 - Starting async processing of schedule11.csv
+2025-09-17 07:11:32 - iptv_api - INFO - processing.py:27 - Successfully processed schedule11.csv, output: ./data/iptv/processed_schedule11.csv
+2025-09-17 07:12:05 - iptv_api - INFO - iptv.py:12 - Starting download_schedule: 16/09/2025 to 17/09/2025, file: schedule.csv
+2025-09-17 07:12:26 - iptv_api - INFO - iptv.py:49 - Download completed successfully: schedule.csv
+2025-09-17 07:12:26 - iptv_api - INFO - processing.py:9 - Starting async processing of schedule11.csv
+2025-09-17 07:12:26 - iptv_api - INFO - processing.py:27 - Successfully processed schedule11.csv, output: ./data/iptv/processed/processed_schedule11.csv
+2025-09-17 07:12:55 - iptv_api - INFO - iptv.py:12 - Starting download_schedule: 16/09/2025 to 17/09/2025, file: schedule.csv
+2025-09-17 07:13:19 - iptv_api - INFO - iptv.py:49 - Download completed successfully: schedule.csv
+2025-09-17 07:13:19 - iptv_api - INFO - processing.py:9 - Starting async processing of schedule11.csv
+2025-09-17 07:13:19 - iptv_api - INFO - processing.py:27 - Successfully processed schedule11.csv, output: ./data/iptv/processed/processed_schedule11.csv
+2025-09-17 07:13:55 - iptv_api - INFO - iptv.py:12 - Starting download_schedule: 16/09/2025 to 17/09/2025, file: schedule.csv
+2025-09-17 07:14:17 - iptv_api - INFO - iptv.py:49 - Download completed successfully: schedule.csv
+2025-09-17 07:14:17 - iptv_api - INFO - iptv.py:12 - Starting download_schedule: 16/09/2025 to 17/09/2025, file: schedule11.csv
+2025-09-17 07:14:42 - iptv_api - INFO - iptv.py:49 - Download completed successfully: schedule11.csv
+2025-09-17 07:15:30 - iptv_api - INFO - iptv.py:15 - Starting download_schedule: 16/09/2025 to 17/09/2025, file: schedule.csv
+2025-09-17 07:15:53 - iptv_api - INFO - iptv.py:54 - Download completed successfully: schedule.csv
+2025-09-17 07:15:54 - iptv_api - INFO - iptv.py:15 - Starting download_schedule: 17/09/2025 to 18/09/2025, file: schedule12.csv
+2025-09-17 07:16:16 - iptv_api - INFO - iptv.py:54 - Download completed successfully: schedule12.csv
+2025-09-17 07:16:32 - iptv_api - INFO - iptv.py:15 - Starting download_schedule: 16/09/2025 to 17/09/2025, file: schedule.csv
+2025-09-17 07:16:56 - iptv_api - INFO - iptv.py:54 - Download completed successfully: schedule.csv
+2025-09-17 07:16:56 - iptv_api - INFO - processing.py:9 - Starting async processing of schedule12.csv
+2025-09-17 07:16:56 - iptv_api - INFO - processing.py:27 - Successfully processed schedule12.csv, output: ./data/iptv/processed/processed_schedule12.csv
+2025-09-17 07:17:37 - iptv_api - INFO - iptv.py:15 - Starting download_schedule: 16/09/2025 to 17/09/2025, file: schedule.csv
+2025-09-17 07:18:07 - iptv_api - INFO - iptv.py:54 - Download completed successfully: schedule.csv
+2025-09-17 07:18:08 - iptv_api - INFO - processing.py:9 - Starting async processing of schedule12.csv
+2025-09-17 07:18:08 - iptv_api - INFO - processing.py:27 - Successfully processed schedule12.csv, output: ./data/iptv/processed/processed_schedule12.csv
+2025-09-17 07:18:15 - iptv_api - INFO - processing.py:9 - Starting async processing of schedule12.csv
+2025-09-17 07:18:15 - iptv_api - INFO - processing.py:27 - Successfully processed schedule12.csv, output: ./data/iptv/processed/processed_schedule12.csv
+2025-09-17 08:45:33 - iptv_api - INFO - main.py:13 - IPTV Schedule API starting up...
+2025-09-17 08:46:37 - iptv_api - INFO - main.py:29 - Download schedule request received: start_date=17/09/2025, end_date=18/09/2025
+2025-09-17 08:46:37 - iptv_api - INFO - main.py:46 - Starting download for file: test.csv
+2025-09-17 08:46:37 - iptv_api - INFO - iptv.py:15 - Starting download_schedule: 17/09/2025 to 18/09/2025, file: test.csv
+2025-09-17 08:46:56 - iptv_api - INFO - iptv.py:54 - Download completed successfully: test.csv
+2025-09-17 08:46:56 - iptv_api - INFO - processing.py:9 - Starting async processing of test.csv
+2025-09-17 08:46:56 - iptv_api - INFO - processing.py:27 - Successfully processed test.csv, output: ./data/iptv/processed/processed_test.csv
+2025-09-17 08:46:56 - iptv_api - INFO - main.py:52 - Schedule downloaded successfully: test.csv
+2025-09-17 08:50:09 - iptv_api - INFO - main.py:29 - Download schedule request received: start_date=15/09/2025, end_date=18/09/2025
+2025-09-17 08:50:09 - iptv_api - INFO - main.py:46 - Starting download for file: test2.csv
+2025-09-17 08:50:09 - iptv_api - INFO - iptv.py:15 - Starting download_schedule: 15/09/2025 to 18/09/2025, file: test2.csv
+2025-09-17 08:50:29 - iptv_api - INFO - iptv.py:54 - Download completed successfully: test2.csv
+2025-09-17 08:50:29 - iptv_api - INFO - processing.py:9 - Starting async processing of test2.csv
+2025-09-17 08:50:29 - iptv_api - INFO - processing.py:27 - Successfully processed test2.csv, output: ./data/iptv/processed/processed_test2.csv
+2025-09-17 08:50:29 - iptv_api - INFO - main.py:52 - Schedule downloaded successfully: test2.csv

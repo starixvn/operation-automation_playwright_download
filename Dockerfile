@@ -26,4 +26,4 @@ WORKDIR /app
 
 # API Service
 CMD xvfb-run --auto-servernum --server-args='-screen 0 1280x720x24' \
-    uvicorn main:app --host 0.0.0.0 --port 8020
+    uvicorn main:app --host 0.0.0.0 --port 8000

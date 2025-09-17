@@ -1,6 +1,6 @@
 fastapi
 uvicorn[standard]
 pydantic
+pandas
 playwright
-charset_normalizer
-markdownify
+python-multipart

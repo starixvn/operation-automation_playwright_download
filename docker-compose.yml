@@ -5,15 +5,9 @@ services:
     container_name: playwright-vnc
     shm_size: 2gb
     ports:
-      - "8020:8020"   # noVNC 網頁
+      - "8000:8000"   # noVNC 網頁
     volumes:
-      - ./work:/work
       - ./:/app # 把錄製的檔案存到本機
-    networks:
-      - ollama-network
     env_file:
       - .env
-networks:
-  ollama-network:
-    external: true
-    name: sql_agent_app-network
+    restart: unless-stopped
