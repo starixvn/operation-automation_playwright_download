@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 
 class IptvRequest(BaseModel):
@@ -14,3 +14,23 @@ class IptvResponse(BaseModel):
     message: str
     filename: Optional[str] = None
     download_time: datetime
+
+
+class InfositeRequest(BaseModel):
+    start_time: str  # 格式: "2025-09-16"
+    end_time: str  # 格式: "2025-09-17"
+    competitions: Optional[List[str]] = None  # 比赛类型列表
+
+
+class InfositeResponse(BaseModel):
+    success: bool
+    message: str
+    filename: str
+    file_path: str
+    download_time: datetime
+
+
+class MergeRequest(BaseModel):
+    iptv_path: str  # IPTV处理后的文件名
+    infosite_path: str  # infosite CSV文件名
+    output_filename: str  # 输出Excel文件名
