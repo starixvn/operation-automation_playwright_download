@@ -9,12 +9,6 @@ from schema.schema import (
     InfositeRequest,
     InfositeResponse,
     MergeRequest,
-    MergeResponse,
-    CompleteWorkflowRequest,
-    CompleteWorkflowResponse,
-    FileListResponse,
-    FileInfoResponse,
-    CompetitionTypes,
 )
 from utils.logger import logger
 from utils.processing import (
@@ -100,8 +94,6 @@ async def merge_to_excel_endpoint(request: MergeRequest):
             "iptv_filename": request.iptv_path,
             "infosite_filename": request.infosite_path,
             "output_path": result["output_path"],
-            "iptv_records": result["iptv_records"],
-            "infosite_records": result["infosite_records"],
             "merge_time": datetime.now(),
         }
 
