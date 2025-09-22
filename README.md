@@ -138,7 +138,7 @@ docker-compose up -d
 
 ### 1. IPTV数据下载
 ```http
-POST /download-schedule
+POST /download-iptv
 Content-Type: application/json
 
 {
@@ -156,32 +156,91 @@ Content-Type: application/json
 {
   "start_time": "2025-09-16",
   "end_time": "2025-09-17",
-  "filename": "infosite.csv",
-  "competitions": ["*UEFA CHAMPIONS LEAGUE"]
+  "filename": "infosite_data",
+  "leagues": ["UEFA Champions League"],
+  "league_groups": ["European"],
+  "sports": ["Soccer"],
+  "save_features": ["match_info", "statistics"],
+  "batch_size": 100
 }
 ```
 
-### 3. 完整工作流程
+**参数说明**:
+- `start_time`: 开始时间 (YYYY-MM-DD格式)
+- `end_time`: 结束时间 (YYYY-MM-DD格式)
+- `filename`: 输出文件名 (不含扩展名，系统会自动添加.xls)
+- `leagues`: 具体联赛名称列表 (可选)
+- `league_groups`: 联赛组别 (可选)
+- `sports`: 运动类型 (可选)
+- `save_features`: 保存的特征数据 (可选)
+- `batch_size`: 批处理大小 (默认100)
+
+**使用示例**:
+```bash
+# 基本下载
+curl -X POST "http://localhost:8000/download-infosite" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "start_time": "2025-09-16",
+       "end_time": "2025-09-17",
+       "filename": "ucl_matches"
+     }'
+
+# 指定联赛下载
+curl -X POST "http://localhost:8000/download-infosite" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "start_time": "2025-09-16",
+       "end_time": "2025-09-17",
+       "filename": "european_matches",
+       "leagues": ["UEFA Champions League", "UEFA Europa League"],
+       "sports": ["Soccer"]
+     }'
+
+# 检查可用联赛
+curl -X POST "http://localhost:8000/check-leagues" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "start_time": "2025-09-16",
+       "end_time": "2025-09-17",
+       "league_groups": ["European"]
+     }'
+```
+
+### 3. 数据合并
 ```http
-POST /complete-workflow
+POST /merge-to-excel
 Content-Type: application/json
 
 {
-  "start_date": "16/09/2025",
-  "end_date": "17/09/2025",
-  "infosite_start_time": "2025-09-16",
-  "infosite_end_time": "2025-09-17",
-  "competitions": ["*UEFA CHAMPIONS LEAGUE"],
-  "output_excel_filename": "report.xlsx"
+  "iptv_path": "./data/iptv/processed/processed_schedule.csv",
+  "infosite_path": "./data/infosite/infosite_data.xls",
+  "output_filename": "merged_report.xlsx"
 }
 ```
 
 ### 4. 文件管理
 ```http
-GET /excel-files              # 列出所有Excel文件
-GET /download-excel/{filename} # 下载Excel文件
-DELETE /excel-files/{filename} # 删除Excel文件
-GET /competitions             # 获取可用比赛类型
+GET /excel-files                           # 列出所有Excel文件
+GET /infosite-files                       # 列出所有Infosite文件
+GET /download-excel?data_type=merge&filename=report.xlsx    # 下载合并的Excel文件
+GET /download-excel?data_type=infosite&filename=data.xls    # 下载Infosite文件
+POST /check-leagues                       # 检查可用联赛
+```
+
+**文件下载示例**:
+```bash
+# 下载合并的Excel文件
+curl "http://localhost:8000/download-excel?data_type=merge&filename=report.xlsx" -O
+
+# 下载Infosite原始文件
+curl "http://localhost:8000/download-excel?data_type=infosite&filename=data.xls" -O
+
+# 列出所有Excel文件
+curl "http://localhost:8000/excel-files"
+
+# 列出所有Infosite文件
+curl "http://localhost:8000/infosite-files"
 ```
 
 ## 项目结构
@@ -241,9 +300,23 @@ BROWSER_TIMEOUT=30000
 4. **格式标准化**: 统一日期时间格式
 
 ### Infosite数据处理
-1. **比赛类型选择**: 支持多种联赛筛选
-2. **日期范围**: 精确的时间段控制
-3. **数据导出**: 自动化的CSV导出流程
+1. **后台任务处理**: 使用FastAPI BackgroundTasks异步处理下载
+2. **多参数配置**: 支持联赛、联赛组别、运动类型等多维度筛选
+3. **批量处理**: 支持自定义batch_size进行批量数据处理
+4. **灵活筛选**: 可选择特定联赛或联赛组别进行数据下载
+5. **特征保存**: 支持选择性保存比赛特征和统计数据
+6. **联赛检查**: 提供API检查指定时间段内的可用联赛
+7. **文件格式**: 输出为.xls格式，兼容Excel和其他数据处理工具
+
+**API特点**:
+- **异步处理**: 下载任务在后台执行，不阻塞API响应
+- **参数验证**: 使用Pydantic进行严格的参数验证
+- **文件管理**: 自动管理输出文件的命名和存储
+- **错误处理**: 完整的异常捕获和日志记录
+
+**数据来源**: Infosite系统 (http://infosite.klt2u.oneback.net)
+**支持格式**: XLS导出，包含完整的比赛信息和统计数据
+**处理方式**: 后台异步处理，支持大批量数据下载
 
 ### Excel报告生成
 1. **多Sheet结构**: IPTV数据和Infosite数据分别存储
@@ -276,13 +349,44 @@ tail -f logs/iptv_api_error_$(date +%Y-%m-%d).log
 ### API文档
 访问 http://localhost:8000/docs 查看完整的Swagger UI文档
 
+## Infosite数据下载注意事项
+
+### 重要说明
+- **登录凭据**: 需要有效的Infosite系统账户 (`INFOSITE_USER`, `INFOSITE_PASSWORD`)
+- **日期格式**: 使用 `YYYY-MM-DD` 格式 (例: `2025-09-16`)
+- **文件名**: 只需提供文件名，系统会自动添加 `.xls` 扩展名
+- **后台处理**: API立即返回，实际下载在后台进行
+- **网络要求**: 需要能够访问 `infosite.klt2u.oneback.net` 域名
+- **浏览器环境**: 需要Chromium浏览器环境支持
+
+### API工作流程
+1. **接收请求**: API接收下载参数并验证
+2. **后台任务**: 创建BackgroundTask进行异步处理
+3. **立即响应**: 返回成功响应，不等待下载完成
+4. **文件生成**: 后台完成下载并保存为 `.xls` 文件
+5. **文件访问**: 通过文件管理API获取下载的文件
+
+### 参数配置
+- **基本参数**: `start_time`, `end_time`, `filename` (必需)
+- **筛选参数**: `leagues`, `league_groups`, `sports` (可选)
+- **处理参数**: `save_features`, `batch_size` (可选)
+- **联赛检查**: 使用 `/check-leagues` 端点查看可用联赛
+
+### 数据特点
+- **异步处理**: 大数据量下载不会阻塞API
+- **灵活筛选**: 支持多维度数据筛选
+- **批量处理**: 可配置批处理大小优化性能
+- **格式兼容**: XLS格式兼容多种数据处理工具
+
 ## 故障排除
 
 ### 常见问题
-1. **登录失败**: 检查环境变量中的用户名密码
-2. **下载失败**: 检查网络连接和目标网站可用性
-3. **处理失败**: 检查CSV文件格式和数据完整性
-4. **Excel生成失败**: 确保模板文件存在且格式正确
+1. **IPTV登录失败**: 检查 `EMAIL` 和 `PASSWORD` 环境变量
+2. **Infosite登录失败**: 检查 `INFOSITE_USER` 和 `INFOSITE_PASSWORD` 环境变量
+3. **下载失败**: 检查网络连接和目标网站可用性
+4. **处理失败**: 检查CSV文件格式和数据完整性
+5. **Excel生成失败**: 确保模板文件存在且格式正确
+6. **比赛类型错误**: 确保使用正确的比赛名称格式
 
 ### 日志分析
 ```bash
