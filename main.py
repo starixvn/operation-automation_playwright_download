@@ -1,14 +1,15 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.responses import FileResponse
-from datetime import datetime, date
+from datetime import datetime
 from script.iptv import download_schedule  # 假设你有这个函数
-from script.infosite import download_infosite_data, download_infosite_with_filters
+from script.infosite import download_infosite_data, get_league_names
 from schema.schema import (
     IptvRequest,
     IptvResponse,
     InfositeRequest,
     InfositeResponse,
     MergeRequest,
+    CheckLeaguesRequest,
 )
 from utils.logger import logger
 from utils.processing import (
@@ -18,6 +19,7 @@ from utils.processing import (
 from pathlib import Path
 import asyncio
 import shutil
+import json
 
 app = FastAPI(title="IPTV Schedule API", version="1.0.0")
 
@@ -68,7 +70,7 @@ async def download_iptv_endpoint(request: IptvRequest):
         return IptvResponse(
             success=True,
             message="IPTV downloaded successfully",
-            filename=f"./data/iptv/processed/{filename}",
+            filename=f"./data/iptv/processed/processed_{filename}",
             download_time=datetime.now(),
         )
     except Exception as e:
@@ -103,66 +105,36 @@ async def merge_to_excel_endpoint(request: MergeRequest):
 
 
 @app.post("/download-infosite", response_model=InfositeResponse)
-async def download_infosite_endpoint(request: InfositeRequest):
+async def download_infosite_endpoint(
+    request: InfositeRequest, background_tasks: BackgroundTasks
+):
     """下载infosite数据"""
     logger.info(f"Infosite download request: {request}")
 
     try:
-        if request.competitions:
-            file_path = await download_infosite_with_filters(
-                request.start_time,
-                request.end_time,
-                request.competitions,
-            )
-        else:
-            file_path = await download_infosite_data(
-                request.start_time, request.end_time
-            )
+        background_tasks.add_task(
+            download_infosite_data,
+            request.start_time,
+            request.end_time,
+            request.filename,
+            request.leagues,
+            request.league_groups,
+            request.sports,
+            request.save_features,
+            request.batch_size,
+        )
 
         return InfositeResponse(
             success=True,
-            message="Infosite data downloaded successfully",
-            filename=Path(file_path).name,
-            file_path=file_path,
+            message="Infosite data downloading successfully",
+            filename=request.filename,
+            file_path=f"./data/infosite/{request.filename}.xls",
             download_time=datetime.now(),
         )
 
     except Exception as e:
         logger.error(f"Error downloading infosite data: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
-
-
-# @app.get("/schedules")
-# async def list_schedules():
-#     """列出所有已下载的调度文件"""
-#     logger.info("Listing all schedule files")
-#     try:
-#         import glob
-
-#         csv_files = glob.glob("schedule*.csv")
-#         logger.debug(f"Found {len(csv_files)} schedule files")
-#         return {"schedules": csv_files}
-#     except Exception as e:
-#         logger.error(f"Error listing schedules: {str(e)}", exc_info=True)
-#         raise HTTPException(status_code=500, detail=str(e))
-
-
-# @app.get("/schedule/{filename}")
-# async def get_schedule(filename: str):
-#     """获取特定调度文件的内容"""
-#     logger.info(f"Retrieving schedule file: {filename}")
-#     try:
-#         import pandas as pd
-
-#         df = pd.read_csv(filename)
-#         logger.debug(f"Successfully loaded {len(df)} records from {filename}")
-#         return {"data": df.to_dict("records")}
-#     except FileNotFoundError:
-#         logger.warning(f"Schedule file not found: {filename}")
-#         raise HTTPException(status_code=404, detail="Schedule file not found")
-#     except Exception as e:
-#         logger.error(f"Error reading schedule file {filename}: {str(e)}", exc_info=True)
-#         raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/infosite-files")
@@ -186,34 +158,47 @@ async def list_infosite_files():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/download-excel/{filename}")
-async def download_excel_file(filename: str):
+@app.get("/download-excel")
+async def download_excel_file(data_type: str, filename: str):
     """下载合并后的Excel文件"""
     logger.info(f"Excel file download request: {filename}")
 
     try:
         # 构建文件路径
-        excel_dir = Path("./data/merge/")
+        if data_type == "infosite":
+            excel_dir = Path("./data/infosite/")
+            if not filename.endswith(".xls"):
+                filename = f"{filename}.xls"
+        elif data_type == "merge":
+            excel_dir = Path("./data/merge/")
+            if not filename.endswith(".xlsx"):
+                filename = f"{filename}.xlsx"
+        else:
+            raise HTTPException(status_code=400, detail="Invalid data type")
 
         # 如果没有扩展名，添加.xlsx
-        if not filename.endswith(".xlsx"):
-            filename = f"{filename}.xlsx"
-
         file_path = excel_dir / filename
-
-        # 检查文件是否存在
+        file_path = Path(file_path)
         if not file_path.exists():
             logger.warning(f"Excel file not found: {file_path}")
             raise HTTPException(
-                status_code=404, detail=f"Excel file '{filename}' not found"
+                status_code=404, detail=f"Excel file '{file_path}' not found"
             )
 
         logger.info(f"Serving Excel file: {file_path}")
 
+        # 根據副檔名決定 MIME type
+        if file_path.suffix == ".xls":
+            media_type = "application/vnd.ms-excel"
+        else:
+            media_type = (
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+
         return FileResponse(
             path=str(file_path),
-            filename=filename,
-            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            filename=filename,  # 確保下載的檔案名稱正確
+            media_type=media_type,
         )
 
     except HTTPException:
@@ -221,6 +206,43 @@ async def download_excel_file(filename: str):
     except Exception as e:
         logger.error(f"Error downloading Excel file: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# @app.get("/download-excel/{filename}")
+# async def download_excel_file(filename: str):
+#     """下载合并后的Excel文件"""
+#     logger.info(f"Excel file download request: {filename}")
+
+#     try:
+#         # 构建文件路径
+#         excel_dir = Path("./data/merge/")
+
+#         # 如果没有扩展名，添加.xlsx
+#         if not filename.endswith(".xlsx"):
+#             filename = f"{filename}.xlsx"
+
+#         file_path = excel_dir / filename
+
+#         # 检查文件是否存在
+#         if not file_path.exists():
+#             logger.warning(f"Excel file not found: {file_path}")
+#             raise HTTPException(
+#                 status_code=404, detail=f"Excel file '{filename}' not found"
+#             )
+
+#         logger.info(f"Serving Excel file: {file_path}")
+
+#         return FileResponse(
+#             path=str(file_path),
+#             filename=filename,
+#             media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+#         )
+
+#     except HTTPException:
+#         raise
+#     except Exception as e:
+#         logger.error(f"Error downloading Excel file: {str(e)}", exc_info=True)
+#         raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/excel-files")
@@ -259,6 +281,17 @@ async def list_excel_files():
     except Exception as e:
         logger.error(f"Error listing Excel files: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/check-leagues", response_model=str)
+async def check_leagues_endpoint(request: CheckLeaguesRequest):
+    """Check leagues names"""
+    logger.info(f"Infosite download Check leagues names")
+    leagues = await get_league_names(
+        request.start_time, request.end_time, request.league_groups
+    )
+    leagues = [league for league in leagues if "-" not in league]
+    return json.dumps(leagues)
 
 
 if __name__ == "__main__":

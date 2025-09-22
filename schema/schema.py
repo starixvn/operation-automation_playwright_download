@@ -19,7 +19,12 @@ class IptvResponse(BaseModel):
 class InfositeRequest(BaseModel):
     start_time: str  # 格式: "2025-09-16"
     end_time: str  # 格式: "2025-09-17"
-    competitions: Optional[List[str]] = None  # 比赛类型列表
+    filename: str  # 可选的文件名
+    leagues: Optional[List[str]] = None  # 比赛类型列表
+    league_groups: Optional[List[str]] = None  # 比赛类型列表
+    sports: Optional[List[str]] = None  # 比赛类型列表
+    save_features: Optional[List[str]] = None  # 比赛类型列表
+    batch_size: Optional[int] = 100  # 比赛类型列表
 
 
 class InfositeResponse(BaseModel):
@@ -34,3 +39,9 @@ class MergeRequest(BaseModel):
     iptv_path: str  # IPTV处理后的文件名
     infosite_path: str  # infosite CSV文件名
     output_filename: str  # 输出Excel文件名
+
+
+class CheckLeaguesRequest(BaseModel):
+    start_time: str  # 格式: "2025-09-16"
+    end_time: str  # 格式: "2025-09-17"
+    league_groups: str  # 比赛类型列表
