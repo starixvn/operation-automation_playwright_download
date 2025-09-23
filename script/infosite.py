@@ -8,8 +8,8 @@ import math
 import time
 import json
 
-infosite_user = os.getenv("INFOSITE_USER", "E2SRobot")
-infosite_password = os.getenv("INFOSITE_PASSWORD", "1111")
+infosite_user = os.getenv("INFOSITE_USER")
+infosite_password = os.getenv("INFOSITE_PASSWORD")
 features = json.load(open("config/export.json"))
 
 
