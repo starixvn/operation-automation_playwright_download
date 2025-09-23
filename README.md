@@ -1,8 +1,8 @@
 # IPTV Schedule API
 
-一个用于自动下载和处理IPTV节目调度数据与Infosite数据，并生成Excel报告的异步API服务。
+An asynchronous API service for automatically downloading and processing IPTV schedule data and Infosite data, and generating Excel reports.
 
-## 项目架构
+## Project Architecture
 
 ```mermaid
 graph TB
@@ -61,82 +61,82 @@ graph TB
     style O fill:#fff3e0
 ```
 
-## 系统架构说明
+## System Architecture Overview
 
-### 1. API层 (FastAPI)
-- **IPTV端点**: 下载和处理IPTV调度数据
-- **Infosite端点**: 下载Infosite比赛数据
-- **合并端点**: 将数据合并生成Excel报告
-- **文件管理**: 下载、列表、删除Excel文件
-- **完整工作流**: 一键完成所有操作
+### 1. API Layer (FastAPI)
+- **IPTV Endpoints**: Download and process IPTV schedule data
+- **Infosite Endpoints**: Download Infosite match data
+- **Merge Endpoints**: Merge data and generate Excel reports
+- **File Management**: Download, list, and delete Excel files
+- **Complete Workflow**: One-click completion of all operations
 
-### 2. 业务逻辑层
-- **IPTV下载**: 自动化浏览器登录并下载调度数据
-- **Infosite下载**: 下载UEFA Champions League等比赛数据
-- **数据处理**: 异步清理、过滤和格式化数据
-- **Excel生成**: 合并多数据源生成结构化报告
+### 2. Business Logic Layer
+- **IPTV Download**: Automated browser login and schedule data download
+- **Infosite Download**: Download match data like UEFA Champions League
+- **Data Processing**: Asynchronous cleaning, filtering, and formatting
+- **Excel Generation**: Merge multiple data sources to generate structured reports
 
-### 3. 数据流程
+### 3. Data Flow
 ```
-用户请求 → API验证 → 并发下载(IPTV+Infosite) → 数据处理 → Excel合并 → 文件下载
+User Request → API Validation → Concurrent Download (IPTV+Infosite) → Data Processing → Excel Merge → File Download
 ```
 
-## 功能特性
+## Features
 
-- ✅ **双数据源下载**: 自动下载IPTV调度数据和Infosite比赛数据
-- ✅ **异步并发处理**: 高性能的异步API设计，支持并发下载
-- ✅ **智能数据过滤**: 自动过滤足球赛事，支持日期范围筛选
-- ✅ **Excel报告生成**: 自动合并多数据源生成结构化Excel报告
-- ✅ **完整日志系统**: 结构化日志记录，支持多级别和多输出
-- ✅ **文件管理**: 完整的文件上传、下载、列表和删除功能
-- ✅ **Docker容器化**: 支持Docker部署，包含浏览器环境
-- ✅ **RESTful API**: 标准化的API设计，完整的错误处理
+- ✅ **Dual Data Source Download**: Automatically download IPTV schedule data and Infosite match data
+- ✅ **Asynchronous Concurrent Processing**: High-performance async API design with concurrent download support
+- ✅ **Intelligent Data Filtering**: Automatic football match filtering with date range support
+- ✅ **Excel Report Generation**: Automatic merging of multiple data sources into structured Excel reports
+- ✅ **Complete Logging System**: Structured logging with multi-level and multi-output support
+- ✅ **File Management**: Complete file upload, download, list, and delete functionality
+- ✅ **Docker Containerization**: Docker deployment support with browser environment
+- ✅ **RESTful API**: Standardized API design with comprehensive error handling
 
-## 快速开始
+## Quick Start
 
-### 环境要求
+### Requirements
 - Python 3.12+
 - Docker & Docker Compose
-- 环境变量: `EMAIL`, `PASSWORD`, `INFOSITE_USER`, `INFOSITE_PASSWORD`
+- Environment variables: `EMAIL`, `PASSWORD`, `INFOSITE_USER`, `INFOSITE_PASSWORD`
 
-### 本地开发
+### Local Development
 
-1. **克隆项目**
+1. **Clone the project**
 ```bash
 git clone <repository-url>
 cd iptv-1
 ```
 
-2. **设置环境变量**
+2. **Set environment variables**
 ```bash
 cp .env.example .env
-# 编辑 .env 文件，设置必要的登录凭据
+# Edit .env file and set necessary login credentials
 ```
 
-3. **安装依赖**
+3. **Install dependencies**
 ```bash
 pip install -r requirements.txt
 playwright install chromium
 ```
 
-4. **启动服务**
+4. **Start the service**
 ```bash
 python main.py
 ```
 
-### Docker部署
+### Docker Deployment
 
 ```bash
 docker-compose up -d
 ```
 
-访问服务:
-- API文档: http://localhost:8000/docs
-- 健康检查: http://localhost:8000/
+Access the service:
+- API Documentation: http://localhost:8000/docs
+- Health Check: http://localhost:8000/
 
-## API端点
+## API Endpoints
 
-### 1. IPTV数据下载
+### 1. IPTV Data Download
 ```http
 POST /download-iptv
 Content-Type: application/json
@@ -148,7 +148,7 @@ Content-Type: application/json
 }
 ```
 
-### 2. Infosite数据下载
+### 2. Infosite Data Download
 ```http
 POST /download-infosite
 Content-Type: application/json
@@ -165,19 +165,19 @@ Content-Type: application/json
 }
 ```
 
-**参数说明**:
-- `start_time`: 开始时间 (YYYY-MM-DD格式)
-- `end_time`: 结束时间 (YYYY-MM-DD格式)
-- `filename`: 输出文件名 (不含扩展名，系统会自动添加.xls)
-- `leagues`: 具体联赛名称列表 (可选)
-- `league_groups`: 联赛组别 (可选)
-- `sports`: 运动类型 (可选)
-- `save_features`: 保存的特征数据 (可选)
-- `batch_size`: 批处理大小 (默认100)
+**Parameter Description**:
+- `start_time`: Start time (YYYY-MM-DD format)
+- `end_time`: End time (YYYY-MM-DD format)
+- `filename`: Output filename (without extension, system will automatically add .xls)
+- `leagues`: Specific league name list (optional)
+- `league_groups`: League groups (optional)
+- `sports`: Sport types (optional)
+- `save_features`: Feature data to save (optional)
+- `batch_size`: Batch processing size (default 100)
 
-**使用示例**:
+**Usage Examples**:
 ```bash
-# 基本下载
+# Basic download
 curl -X POST "http://localhost:8000/download-infosite" \
      -H "Content-Type: application/json" \
      -d '{
@@ -186,7 +186,7 @@ curl -X POST "http://localhost:8000/download-infosite" \
        "filename": "ucl_matches"
      }'
 
-# 指定联赛下载
+# Download specific leagues
 curl -X POST "http://localhost:8000/download-infosite" \
      -H "Content-Type: application/json" \
      -d '{
@@ -197,7 +197,7 @@ curl -X POST "http://localhost:8000/download-infosite" \
        "sports": ["Soccer"]
      }'
 
-# 检查可用联赛
+# Check available leagues
 curl -X POST "http://localhost:8000/check-leagues" \
      -H "Content-Type: application/json" \
      -d '{
@@ -207,7 +207,7 @@ curl -X POST "http://localhost:8000/check-leagues" \
      }'
 ```
 
-### 3. 数据合并
+### 3. Data Merging
 ```http
 POST /merge-to-excel
 Content-Type: application/json
@@ -219,71 +219,71 @@ Content-Type: application/json
 }
 ```
 
-### 4. 文件管理
+### 4. File Management
 ```http
-GET /excel-files                           # 列出所有Excel文件
-GET /infosite-files                       # 列出所有Infosite文件
-GET /download-excel?data_type=merge&filename=report.xlsx    # 下载合并的Excel文件
-GET /download-excel?data_type=infosite&filename=data.xls    # 下载Infosite文件
-POST /check-leagues                       # 检查可用联赛
+GET /excel-files                           # List all Excel files
+GET /infosite-files                       # List all Infosite files
+GET /download-excel?data_type=merge&filename=report.xlsx    # Download merged Excel file
+GET /download-excel?data_type=infosite&filename=data.xls    # Download Infosite file
+POST /check-leagues                       # Check available leagues
 ```
 
-**文件下载示例**:
+**File Download Examples**:
 ```bash
-# 下载合并的Excel文件
+# Download merged Excel file
 curl "http://localhost:8000/download-excel?data_type=merge&filename=report.xlsx" -O
 
-# 下载Infosite原始文件
+# Download Infosite raw file
 curl "http://localhost:8000/download-excel?data_type=infosite&filename=data.xls" -O
 
-# 列出所有Excel文件
+# List all Excel files
 curl "http://localhost:8000/excel-files"
 
-# 列出所有Infosite文件
+# List all Infosite files
 curl "http://localhost:8000/infosite-files"
 ```
 
-## 项目结构
+## Project Structure
 
 ```
 iptv-1/
-├── main.py                 # FastAPI应用主文件
-├── docker-compose.yml      # Docker编排配置
-├── Dockerfile             # Docker镜像构建
-├── requirements.txt       # Python依赖包
-├── .env                   # 环境变量配置
-├── .gitignore            # Git忽略文件
+├── main.py                 # FastAPI application main file
+├── docker-compose.yml      # Docker orchestration configuration
+├── Dockerfile             # Docker image build
+├── requirements.txt       # Python dependencies
+├── .env                   # Environment variable configuration
+├── .gitignore            # Git ignore file
 ├── script/
-│   ├── iptv.py           # IPTV下载服务
-│   └── infosite.py       # Infosite下载服务
+│   ├── iptv.py           # IPTV download service
+│   └── infosite.py       # Infosite download service
 ├── utils/
-│   ├── logger.py         # 日志配置系统
-│   └── processing.py     # 数据处理逻辑
+│   ├── logger.py         # Logging configuration system
+│   └── processing.py     # Data processing logic
 ├── schema/
-│   └── schema.py         # Pydantic数据模型
+│   └── schema.py         # Pydantic data models
 ├── data/
 │   ├── iptv/
-│   │   ├── original/     # IPTV原始下载文件
-│   │   └── processed/    # IPTV处理后文件
-│   ├── infosite/         # Infosite数据文件
-│   ├── merge/            # 合并后的Excel文件
-│   └── formula.xlsx      # Excel模板文件
-└── logs/                 # 应用日志文件
+│   │   ├── original/     # IPTV raw download files
+│   │   └── processed/    # IPTV processed files
+│   ├── infosite/         # Infosite data files
+│   ├── merge/            # Merged Excel files
+│   └── formula.xlsx      # Excel template file
+└── logs/                 # Application log files
 ```
 
-## 配置说明
+## Configuration
 
-### 环境变量
+### Environment Variables
 ```bash
-# IPTV网站凭据
+# IPTV website credentials
 EMAIL=your_iptv_email@example.com
 PASSWORD=your_iptv_password
 
-# Infosite网站凭据
+# Infosite website credentials
 INFOSITE_USER=your_infosite_username
 INFOSITE_PASSWORD=your_infosite_password
 
-# 应用设置
+# Application settings
 LOG_LEVEL=INFO
 API_HOST=0.0.0.0
 API_PORT=8000
@@ -291,146 +291,138 @@ HEADLESS=true
 BROWSER_TIMEOUT=30000
 ```
 
-## 数据处理逻辑
+## Data Processing Logic
 
-### IPTV数据处理
-1. **数据清理**: 删除无用列 (`EventId`)
-2. **类型过滤**: 仅保留足球赛事 (`Sport == "Soccer"`)
-3. **时间过滤**: 按指定日期范围筛选
-4. **格式标准化**: 统一日期时间格式
+### IPTV Data Processing
+1. **Data Cleaning**: Remove unused columns (`EventId`)
+2. **Type Filtering**: Keep only football matches (`Sport == "Soccer"`)
+3. **Time Filtering**: Filter by specified date range
+4. **Format Standardization**: Unify date-time format
 
-### Infosite数据处理
-1. **后台任务处理**: 使用FastAPI BackgroundTasks异步处理下载
-2. **多参数配置**: 支持联赛、联赛组别、运动类型等多维度筛选
-3. **批量处理**: 支持自定义batch_size进行批量数据处理
-4. **灵活筛选**: 可选择特定联赛或联赛组别进行数据下载
-5. **特征保存**: 支持选择性保存比赛特征和统计数据
-6. **联赛检查**: 提供API检查指定时间段内的可用联赛
-7. **文件格式**: 输出为.xls格式，兼容Excel和其他数据处理工具
+### Infosite Data Processing
+1. **Background Task Processing**: Use FastAPI BackgroundTasks for asynchronous download processing
+2. **Multi-parameter Configuration**: Support multi-dimensional filtering by leagues, league groups, sport types, etc.
+3. **Batch Processing**: Support custom batch_size for batch data processing
+4. **Flexible Filtering**: Option to select specific leagues or league groups for data download
+5. **Feature Saving**: Support selective saving of match features and statistical data
+6. **League Checking**: Provide API to check available leagues within specified time periods
+7. **File Format**: Output in .xls format, compatible with Excel and other data processing tools
 
-**API特点**:
-- **异步处理**: 下载任务在后台执行，不阻塞API响应
-- **参数验证**: 使用Pydantic进行严格的参数验证
-- **文件管理**: 自动管理输出文件的命名和存储
-- **错误处理**: 完整的异常捕获和日志记录
+**API Features**:
+- **Asynchronous Processing**: Download tasks execute in background without blocking API response
+- **Parameter Validation**: Use Pydantic for strict parameter validation
+- **File Management**: Automatically manage output file naming and storage
+- **Error Handling**: Complete exception catching and logging
 
-**数据来源**: Infosite系统 (http://infosite.klt2u.oneback.net)
-**支持格式**: XLS导出，包含完整的比赛信息和统计数据
-**处理方式**: 后台异步处理，支持大批量数据下载
+**Data Source**: Infosite System (http://infosite.klt2u.oneback.net)
+**Supported Format**: XLS export with complete match information and statistical data
+**Processing Method**: Background asynchronous processing, supports large-scale data downloads
 
-### Excel报告生成
-1. **多Sheet结构**: IPTV数据和Infosite数据分别存储
-2. **模板继承**: 基于预定义Excel模板
-3. **数据验证**: 确保数据完整性和格式正确
+### Excel Report Generation
+1. **Multi-Sheet Structure**: IPTV data and Infosite data stored separately
+2. **Template Inheritance**: Based on predefined Excel templates
+3. **Data Validation**: Ensure data integrity and format correctness
 
-## 日志系统
+## Logging System
 
-- **控制台输出**: 实时日志显示
-- **文件日志**: `logs/iptv_api_YYYY-MM-DD.log`
-- **错误日志**: `logs/iptv_api_error_YYYY-MM-DD.log`
-- **日志格式**: 时间戳 + 级别 + 文件名 + 行号 + 消息
+- **Console Output**: Real-time log display
+- **File Logging**: `logs/iptv_api_YYYY-MM-DD.log`
+- **Error Logging**: `logs/iptv_api_error_YYYY-MM-DD.log`
+- **Log Format**: Timestamp + Level + Filename + Line Number + Message
 
-## 监控和调试
+## Monitoring and Debugging
 
-### 健康检查
+### Health Check
 ```bash
 curl http://localhost:8000/
 ```
 
-### 查看日志
+### View Logs
 ```bash
-# 实时日志
+# Real-time logs
 docker-compose logs -f
 
-# 错误日志
+# Error logs
 tail -f logs/iptv_api_error_$(date +%Y-%m-%d).log
 ```
 
-### API文档
-访问 http://localhost:8000/docs 查看完整的Swagger UI文档
+### API Documentation
+Visit http://localhost:8000/docs to view complete Swagger UI documentation
 
-## Infosite数据下载注意事项
+## Infosite Data Download Notes
 
-### 重要说明
-- **登录凭据**: 需要有效的Infosite系统账户 (`INFOSITE_USER`, `INFOSITE_PASSWORD`)
-- **日期格式**: 使用 `YYYY-MM-DD` 格式 (例: `2025-09-16`)
-- **文件名**: 只需提供文件名，系统会自动添加 `.xls` 扩展名
-- **后台处理**: API立即返回，实际下载在后台进行
-- **网络要求**: 需要能够访问 `infosite.klt2u.oneback.net` 域名
-- **浏览器环境**: 需要Chromium浏览器环境支持
+### Important Information
+- **Login Credentials**: Requires valid Infosite system account (`INFOSITE_USER`, `INFOSITE_PASSWORD`)
+- **Date Format**: Use `YYYY-MM-DD` format (e.g., `2025-09-16`)
+- **Filename**: Only provide the filename, system will automatically add `.xls` extension
+- **Background Processing**: API returns immediately, actual download happens in background
+- **Network Requirements**: Need access to `infosite.klt2u.oneback.net` domain
+- **Browser Environment**: Requires Chromium browser environment support
 
-### API工作流程
-1. **接收请求**: API接收下载参数并验证
-2. **后台任务**: 创建BackgroundTask进行异步处理
-3. **立即响应**: 返回成功响应，不等待下载完成
-4. **文件生成**: 后台完成下载并保存为 `.xls` 文件
-5. **文件访问**: 通过文件管理API获取下载的文件
+### API Workflow
+1. **Receive Request**: API receives download parameters and validates them
+2. **Background Task**: Create BackgroundTask for asynchronous processing
+3. **Immediate Response**: Return success response without waiting for download completion
+4. **File Generation**: Background completes download and saves as `.xls` file
+5. **File Access**: Access downloaded files through file management API
 
-### 参数配置
-- **基本参数**: `start_time`, `end_time`, `filename` (必需)
-- **筛选参数**: `leagues`, `league_groups`, `sports` (可选)
-- **处理参数**: `save_features`, `batch_size` (可选)
-- **联赛检查**: 使用 `/check-leagues` 端点查看可用联赛
+### Parameter Configuration
+- **Basic Parameters**: `start_time`, `end_time`, `filename` (required)
+- **Filter Parameters**: `leagues`, `league_groups`, `sports` (optional)
+- **Processing Parameters**: `save_features`, `batch_size` (optional)
+- **League Check**: Use `/check-leagues` endpoint to view available leagues
 
-### 数据特点
-- **异步处理**: 大数据量下载不会阻塞API
-- **灵活筛选**: 支持多维度数据筛选
-- **批量处理**: 可配置批处理大小优化性能
-- **格式兼容**: XLS格式兼容多种数据处理工具
+### Data Characteristics
+- **Asynchronous Processing**: Large data downloads won't block API
+- **Flexible Filtering**: Support multi-dimensional data filtering
+- **Batch Processing**: Configurable batch size for performance optimization
+- **Format Compatibility**: XLS format compatible with various data processing tools
 
-## 故障排除
+## Troubleshooting
 
-### 常见问题
-1. **IPTV登录失败**: 检查 `EMAIL` 和 `PASSWORD` 环境变量
-2. **Infosite登录失败**: 检查 `INFOSITE_USER` 和 `INFOSITE_PASSWORD` 环境变量
-3. **下载失败**: 检查网络连接和目标网站可用性
-4. **处理失败**: 检查CSV文件格式和数据完整性
-5. **Excel生成失败**: 确保模板文件存在且格式正确
-6. **比赛类型错误**: 确保使用正确的比赛名称格式
+### Common Issues
+1. **IPTV Login Failed**: Check `EMAIL` and `PASSWORD` environment variables
+2. **Infosite Login Failed**: Check `INFOSITE_USER` and `INFOSITE_PASSWORD` environment variables
+3. **Download Failed**: Check network connection and target website availability
+4. **Processing Failed**: Check CSV file format and data integrity
+5. **Excel Generation Failed**: Ensure template file exists and format is correct
+6. **Match Type Error**: Ensure using correct match name format
 
-### 日志分析
+### Log Analysis
 ```bash
-# 查看错误日志
+# View error logs
 grep "ERROR" logs/iptv_api_*.log
 
-# 查看特定操作
+# View specific operations
 grep "complete-workflow" logs/iptv_api_*.log
 ```
 
-## 开发指南
+## Development Guide
 
-### 添加新功能
-1. 在对应模块添加业务逻辑
-2. 更新 `schema/schema.py` 数据模型
-3. 在 `main.py` 添加API端点
-4. 添加完整的日志记录和错误处理
-5. 更新文档和测试
+### Adding New Features
+1. Add business logic in corresponding modules
+2. Update `schema/schema.py` data models
+3. Add API endpoints in `main.py`
+4. Add complete logging and error handling
+5. Update documentation and tests
 
-### 代码规范
-- 使用异步编程 (`async/await`)
-- 完整的错误处理和日志记录
-- Pydantic模型验证
-- 类型提示 (Type Hints)
-- 遵循RESTful API设计原则
+### Code Standards
+- Use asynchronous programming (`async/await`)
+- Complete error handling and logging
+- Pydantic model validation
+- Type hints (Type Hints)
+- Follow RESTful API design principles
 
-## 版本历史
+## Version History
 
-- **v1.0.0**: 初始版本，基础IPTV下载功能
-- **v1.1.0**: 添加异步处理和日志系统
-- **v1.2.0**: Docker容器化和API优化
-- **v1.3.0**: 添加Infosite数据下载
-- **v1.4.0**: Excel报告生成和文件管理
-- **v1.5.0**: 完整工作流程和并发处理
-
-## 许可证
-
-MIT License
-
-## 贡献
-
-欢迎提交Issue和Pull Request来改进这个项目。
+- **v1.0.0**: Initial version with basic IPTV download functionality
+- **v1.1.0**: Added asynchronous processing and logging system
+- **v1.2.0**: Docker containerization and API optimization
+- **v1.3.0**: Added Infosite data download
+- **v1.4.0**: Excel report generation and file management
+- **v1.5.0**: Complete workflow and concurrent processing
 
 ---
 
-**作者**: Robert Tseng
-**更新时间**: 2025-09-17
+**Author**: Robert Tseng
+**Last Updated**: 2025-09-17
