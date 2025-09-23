@@ -8,8 +8,8 @@ import math
 import time
 import json
 
-infosite_user = os.getenv("INFOSITE_USER")
-infosite_password = os.getenv("INFOSITE_PASSWORD")
+infosite_user = os.getenv("INFOSITE_USER", "E2SRobot")
+infosite_password = os.getenv("INFOSITE_PASSWORD", "1111")
 features = json.load(open("config/export.json"))
 
 
@@ -30,7 +30,7 @@ async def get_league_names(
             page = await context.new_page()
 
             logger.debug("Navigating to infosite login page...")
-            await page.goto("http://infosite.klt2u.oneback.net/info_backend/")
+            await page.goto("http://infosite.klt2p.oneback.net/info_backend/")
             await asyncio.sleep(10)
             logger.debug("Filling login credentials...")
             await page.get_by_role("textbox", name="Username").click()
@@ -61,7 +61,7 @@ async def get_league_names(
             await asyncio.sleep(3)
 
             logger.debug("Starting search...")
-            await page1.get_by_role("button", name="28 selected").click()
+            await page1.get_by_role("button", name="27 selected").click()
             await page1.get_by_role("checkbox", name="All", exact=True).check()
             for leagues_group in leagues_groups:
                 await page1.get_by_role(
@@ -132,7 +132,7 @@ async def download_infosite_data(
             page = await context.new_page()
 
             logger.debug("Navigating to infosite login page...")
-            await page.goto("http://infosite.klt2u.oneback.net/info_backend/")
+            await page.goto("http://infosite.klt2p.oneback.net/info_backend/")
             await asyncio.sleep(10)
             logger.debug("Filling login credentials...")
             await page.get_by_role("textbox", name="Username").click()
@@ -163,14 +163,14 @@ async def download_infosite_data(
             await asyncio.sleep(3)
 
             logger.debug("Starting search...")
-            await page1.get_by_role("button", name="28 selected").click()
+            await page1.get_by_role("button", name="27 selected").click()
             await page1.get_by_role("checkbox", name="All", exact=True).check()
             for leagues_group in league_groups:
                 await page1.get_by_role(
                     "checkbox", name=leagues_group, exact=True
                 ).check()
             if sports:
-                await page1.get_by_role("button", name="Soccer").click()
+                await page1.get_by_role("button", name="Soccer", exact=True).click()
                 await page1.get_by_text("Clear", exact=True).click()
                 for sport in sports:
                     await page1.get_by_role("checkbox", name=sport, exact=True).check()
