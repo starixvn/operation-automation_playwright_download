@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  playwright-vnc:
+    build: .
+    container_name: playwright-vnc
+    shm_size: 2gb
+    ports:
+      - "8000:8000"   # noVNC 網頁
+    volumes:
+      - ./:/app # 把錄製的檔案存到本機
+    env_file:
+      - .env
+    restart: unless-stopped

@@ -1,0 +1,20 @@
+{
+    "coverage": "#export_coverageCheckbox",
+    "code": "#export_codeCheckbox",
+    "wb": "#export_wbCheckbox",
+    "round": "#export_roundCheckbox",
+    "etpk": "#export_etpkCheckbox",
+    "venue": "#export_venueCheckbox",
+    "goalDiff": "#export_goalDiffCheckbox",
+    "website1": "#export_website1Checkbox",
+    "website2": "#export_website2Checkbox",
+    "website3": "#export_website3Checkbox",
+    "website4": "#export_website4Checkbox",
+    "provider": "#export_providerCheckbox",
+    "remark": "#export_remarkCheckbox",
+    "remark2": "#export_remark2Checkbox",
+    "remark3": "#export_remark3Checkbox",
+    "homeremark": "#export_homeremarkCheckbox",
+    "awayremark": "#export_awayremarkCheckbox",
+    "displaymodedesc": "#export_displaymodedescCheckbox"
+}
