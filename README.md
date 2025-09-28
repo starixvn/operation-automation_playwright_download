@@ -413,16 +413,8 @@ grep "complete-workflow" logs/iptv_api_*.log
 - Type hints (Type Hints)
 - Follow RESTful API design principles
 
-## Version History
-
-- **v1.0.0**: Initial version with basic IPTV download functionality
-- **v1.1.0**: Added asynchronous processing and logging system
-- **v1.2.0**: Docker containerization and API optimization
-- **v1.3.0**: Added Infosite data download
-- **v1.4.0**: Excel report generation and file management
-- **v1.5.0**: Complete workflow and concurrent processing
 
 ---
 
 **Author**: Robert Tseng
-**Last Updated**: 2025-09-17
+**Last Updated**: 2025-09-28
