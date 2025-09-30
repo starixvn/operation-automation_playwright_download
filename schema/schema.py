@@ -43,5 +43,6 @@ class MergeRequest(BaseModel):
 
 class CheckLeaguesRequest(BaseModel):
     start_time: str  # 格式: "2025-09-16"
-    end_time: str  # 格式: "2025-09-17"
-    league_groups: str  # 比赛类型列表
+    end_time: str
+    sports: Optional[List[str]] = None  # 格式: "2025-09-17"
+    league_groups: Optional[List[str]] = None  # 比赛类型列表

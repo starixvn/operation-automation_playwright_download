@@ -16,6 +16,7 @@ features = json.load(open("config/export.json"))
 async def get_league_names(
     start_time: str,
     end_time: str,
+    sports: list = None,
     leagues_groups: list = None,
 ) -> list:
     logger.info(f"Starting infosite check league: {start_time} to {end_time}")
@@ -67,6 +68,11 @@ async def get_league_names(
                 await page1.get_by_role(
                     "checkbox", name=leagues_group, exact=True
                 ).check()
+            if sports:
+                await page1.get_by_role("button", name="Soccer", exact=True).click()
+                await page1.get_by_text("Clear", exact=True).click()
+                for sport in sports:
+                    await page1.get_by_role("checkbox", name=sport, exact=True).check()
             await page1.get_by_role("button", name="Find").click()
             await asyncio.sleep(10)
             await page1.get_by_role("button", name="None").click()

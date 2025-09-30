@@ -288,7 +288,7 @@ async def check_leagues_endpoint(request: CheckLeaguesRequest):
     """Check leagues names"""
     logger.info(f"Infosite download Check leagues names")
     leagues = await get_league_names(
-        request.start_time, request.end_time, request.league_groups
+        request.start_time, request.end_time, request.sports, request.league_groups
     )
     leagues = [league for league in leagues if "-" not in league]
     return json.dumps(leagues)
