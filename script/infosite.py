@@ -61,7 +61,7 @@ async def get_league_names(
             await asyncio.sleep(3)
 
             logger.debug("Starting search...")
-            await page1.get_by_role("button", name="27 selected").click()
+            await page1.get_by_role("button", name="28 selected").click()
             await page1.get_by_role("checkbox", name="All", exact=True).check()
             for leagues_group in leagues_groups:
                 await page1.get_by_role(
@@ -163,7 +163,7 @@ async def download_infosite_data(
             await asyncio.sleep(3)
 
             logger.debug("Starting search...")
-            await page1.get_by_role("button", name="27 selected").click()
+            await page1.get_by_role("button", name="28 selected").click()
             await page1.get_by_role("checkbox", name="All", exact=True).check()
             for leagues_group in league_groups:
                 await page1.get_by_role(
