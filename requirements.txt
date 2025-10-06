@@ -7,3 +7,4 @@ python-multipart
 openpyxl
 xlsxwriter
 xlrd
+python-dotenv

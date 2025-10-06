@@ -28,10 +28,6 @@ ENV/
 .venv/
 .env/
 
-# Environment Variables
-.env
-.env.local
-.env.production
 
 # IDE
 .vscode/

@@ -1,11 +1,12 @@
-import asyncio
-import re
 from playwright.async_api import Playwright, async_playwright, expect
 import os
+from dotenv import load_dotenv
 from utils.logger import logger
 import pandas as pd
 import io
 import json
+
+load_dotenv()
 
 email = os.environ.get("EMAIL")
 password = os.environ.get("PASSWORD")

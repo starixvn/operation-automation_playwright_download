@@ -7,6 +7,9 @@ import pandas as pd
 import math
 import time
 import json
+from dotenv import load_dotenv
+
+load_dotenv()
 
 infosite_user = os.getenv("INFOSITE_USER")
 infosite_password = os.getenv("INFOSITE_PASSWORD")
