@@ -10,6 +10,7 @@ from schema.schema import (
     InfositeResponse,
     MergeRequest,
     CheckLeaguesRequest,
+    CheckLeaguesResponse
 )
 from utils.logger import logger
 from utils.processing import (
@@ -208,43 +209,6 @@ async def download_excel_file(data_type: str, filename: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# @app.get("/download-excel/{filename}")
-# async def download_excel_file(filename: str):
-#     """下载合并后的Excel文件"""
-#     logger.info(f"Excel file download request: {filename}")
-
-#     try:
-#         # 构建文件路径
-#         excel_dir = Path("./data/merge/")
-
-#         # 如果没有扩展名，添加.xlsx
-#         if not filename.endswith(".xlsx"):
-#             filename = f"{filename}.xlsx"
-
-#         file_path = excel_dir / filename
-
-#         # 检查文件是否存在
-#         if not file_path.exists():
-#             logger.warning(f"Excel file not found: {file_path}")
-#             raise HTTPException(
-#                 status_code=404, detail=f"Excel file '{filename}' not found"
-#             )
-
-#         logger.info(f"Serving Excel file: {file_path}")
-
-#         return FileResponse(
-#             path=str(file_path),
-#             filename=filename,
-#             media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-#         )
-
-#     except HTTPException:
-#         raise
-#     except Exception as e:
-#         logger.error(f"Error downloading Excel file: {str(e)}", exc_info=True)
-#         raise HTTPException(status_code=500, detail=str(e))
-
-
 @app.get("/excel-files")
 async def list_excel_files():
     """列出所有可用的Excel文件"""
@@ -282,17 +246,19 @@ async def list_excel_files():
         logger.error(f"Error listing Excel files: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
-
-@app.post("/check-leagues", response_model=str)
+@app.post("/check-leagues", response_model=CheckLeaguesResponse)
 async def check_leagues_endpoint(request: CheckLeaguesRequest):
     """Check leagues names"""
     logger.info(f"Infosite download Check leagues names")
     leagues = await get_league_names(
-        request.start_time, request.end_time, request.sports, request.league_groups
+        request.start_time, request.end_time, request.league_groups
     )
     leagues = [league for league in leagues if "-" not in league]
-    return json.dumps(leagues)
-
+    return CheckLeaguesResponse(
+        success=True,
+        count=len(leagues),
+        leagues=leagues,
+    )
 
 if __name__ == "__main__":
     import uvicorn
