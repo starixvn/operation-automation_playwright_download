@@ -13,7 +13,11 @@ async def processing_iptv(filename: str, start_date: str, end_date: str):
 
     try:
         # 异步读取CSV文件
-        df = await asyncio.to_thread(pd.read_csv, f"./data/iptv/original/{filename}")
+        df = await asyncio.to_thread(pd.read_csv, f"./data/iptv/original/{filename}",
+            engine="python",
+            quotechar='"',
+            on_bad_lines="skip",
+        )
         logger.debug(f"Loaded {len(df)} records from {filename}")
 
         # 异步处理数据
@@ -47,8 +51,8 @@ def _process_dataframe(
 
     # 处理日期过滤
     df["StartDate"] = pd.to_datetime(df["Start Date"])
-    df = df[df["StartDate"] >= pd.to_datetime(f"{start_date} 12:00PM")]
-    df = df[df["StartDate"] <= pd.to_datetime(f"{end_date} 11:59AM")]
+    df = df[df["StartDate"] >= pd.to_datetime(f"{start_date} 12:00PM", format="%d/%m/%Y %I:%M%p")]
+    df = df[df["StartDate"] <= pd.to_datetime(f"{end_date} 11:59AM", format="%d/%m/%Y %I:%M%p")]
 
     # 删除临时的StartDate列
     df.drop(columns=["StartDate"], inplace=True)

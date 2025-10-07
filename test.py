@@ -20,18 +20,17 @@ import asyncio
 #     )
 # )
 
-leagues_groups = [
-    "Soccerway",
-]
+leagues_groups = ["Soccerway", "7M"]
 start_time = "2025-09-23"
 end_time = "2025-09-24"
-# result = asyncio.run(
-#     get_league_names(
-#         start_time=start_time,
-#         end_time=end_time,
-#         leagues_groups=leagues_groups,
-#     )
-# )
+result = asyncio.run(
+    get_league_names(
+        start_time=start_time,
+        end_time=end_time,
+        leagues_groups=leagues_groups,
+        sports=["Soccer", "Bandy"],
+    )
+)
 # print(len(result))
 # # result = [label for label in result if "-" not in label]
 # # print(len(result))
@@ -53,18 +52,15 @@ end_time = "2025-09-24"
 # #     "batch_size": 50,
 # # }
 
-leagues = [
-    "*SPAIN PRIMERA LALIGA",
-    "*UEFA EUROPA LEAGUE",
-]
+
 asyncio.run(
     download_infosite_data(
         start_time=start_time,
         end_time=end_time,
         filename=f"{start_time}_{end_time}",
-        leagues=leagues,
+        leagues=result,
         league_groups=leagues_groups,
-        sports=["Soccer"],
+        sports=["Soccer", "Bandy"],
         save_features=["website1", "website2", "website3", "website4"],
         batch_size=50,
     )

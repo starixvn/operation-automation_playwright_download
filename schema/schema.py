@@ -40,8 +40,12 @@ class MergeRequest(BaseModel):
     infosite_path: str  # infosite CSV文件名
     output_filename: str  # 输出Excel文件名
 
-
 class CheckLeaguesRequest(BaseModel):
     start_time: str  # 格式: "2025-09-16"
     end_time: str  # 格式: "2025-09-17"
-    league_groups: str  # 比赛类型列表
+    league_groups: list[str]  # 比赛类型列表
+
+class CheckLeaguesResponse(BaseModel):
+    success: bool
+    count: int
+    leagues: list[str]
