@@ -50,9 +50,10 @@ def _process_dataframe(
     df = df[df["Sport"] == "Soccer"]
 
     # 处理日期过滤
-    df["StartDate"] = pd.to_datetime(df["Start Date"])
+    df["StartDate"] = pd.to_datetime(df["Start Date"])+pd.Timedelta(hours=8)
     df = df[df["StartDate"] >= pd.to_datetime(f"{start_date} 12:00PM", format="%d/%m/%Y %I:%M%p")]
     df = df[df["StartDate"] <= pd.to_datetime(f"{end_date} 11:59AM", format="%d/%m/%Y %I:%M%p")]
+    df["Start Date"] = df["StartDate"].dt.strftime("%m/%d/%Y %I:%M %p")
 
     # 删除临时的StartDate列
     df.drop(columns=["StartDate"], inplace=True)
