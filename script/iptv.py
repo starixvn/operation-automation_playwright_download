@@ -1,15 +1,18 @@
 from playwright.async_api import Playwright, async_playwright, expect
-import os
-from dotenv import load_dotenv
+from config.env_config import config
 from utils.logger import logger
 import pandas as pd
 import io
 import json
 
-load_dotenv()
+# Load configuration
+email = config.get("EMAIL")
+password = config.get("PASSWORD")
+headless = config.get_bool("HEADLESS", False)
 
-email = os.environ.get("EMAIL")
-password = os.environ.get("PASSWORD")
+# Proxy configuration
+http_proxy = config.get("HTTP_PROXY")
+https_proxy = config.get("HTTPS_PROXY")
 
 
 async def download_schedule_backup(start_date: str, end_date: str):
@@ -21,8 +24,24 @@ async def download_schedule_backup(start_date: str, end_date: str):
         # context = None
         try:
             logger.debug("Launching browser...")
-            browser = await playwright.chromium.launch(headless=True)
-            context = await browser.new_context()
+
+            # Configure proxy if available
+            launch_options = {"headless": headless}
+            context_options = {}
+
+            if http_proxy or https_proxy:
+                proxy_config = {}
+                if http_proxy:
+                    proxy_config["server"] = http_proxy
+                    logger.info(f"Using HTTP proxy: {http_proxy}")
+                elif https_proxy:
+                    proxy_config["server"] = https_proxy
+                    logger.info(f"Using HTTPS proxy: {https_proxy}")
+
+                context_options["proxy"] = proxy_config
+
+            browser = await playwright.chromium.launch(**launch_options)
+            context = await browser.new_context(**context_options)
             page = await context.new_page()
 
             logger.debug("Navigating to login page...")

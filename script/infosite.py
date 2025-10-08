@@ -7,13 +7,17 @@ import pandas as pd
 import math
 import time
 import json
-from dotenv import load_dotenv
+from config.env_config import config
 
-load_dotenv()
-
-infosite_user = os.getenv("INFOSITE_USER")
-infosite_password = os.getenv("INFOSITE_PASSWORD")
+# Load configuration
+infosite_user = config.get("INFOSITE_USER")
+infosite_password = config.get("INFOSITE_PASSWORD")
+headless = config.get_bool("HEADLESS", False)
 features = json.load(open("config/export.json"))
+
+# Proxy configuration
+http_proxy = config.get("HTTP_PROXY")
+https_proxy = config.get("HTTPS_PROXY")
 
 
 async def get_league_names(
@@ -27,45 +31,63 @@ async def get_league_names(
         browser = None
         context = None
         try:
-            logger.debug("Launching browser for infosite check league...")
-            browser = await playwright.chromium.launch(headless=False)
-            context = await browser.new_context(accept_downloads=True)
+            logger.info("Launching browser for infosite check league...")
+
+            # Configure proxy if available
+            launch_options = {"headless": headless}
+            context_options = {"accept_downloads": True}
+
+            if http_proxy or https_proxy:
+                proxy_config = {}
+                if http_proxy:
+                    proxy_config["server"] = http_proxy
+                    logger.info(f"Using HTTP proxy: {http_proxy}")
+                elif https_proxy:
+                    proxy_config["server"] = https_proxy
+                    logger.info(f"Using HTTPS proxy: {https_proxy}")
+
+                context_options["proxy"] = proxy_config
+
+            browser = await playwright.chromium.launch(**launch_options)
+            context = await browser.new_context(**context_options)
             page = await context.new_page()
 
-            logger.debug("Navigating to infosite login page...")
+            logger.info("Navigating to infosite login page...")
             await page.goto("http://infosite.klt2p.oneback.net/info_backend/")
             await asyncio.sleep(10)
-            logger.debug("Filling login credentials...")
+            logger.info("Filling login credentials...")
             await page.get_by_role("textbox", name="Username").click()
             await page.get_by_role("textbox", name="Username").fill(infosite_user)
             await page.get_by_role("textbox", name="Password").click()
             await page.get_by_role("textbox", name="Password").fill(infosite_password)
 
-            logger.debug("Logging in...")
+            logger.info("Logging in...")
             await page.get_by_role("button", name="Login ").click()
             await asyncio.sleep(3)
 
-            logger.debug("Opening Event Schedule page...")
+            logger.info("Opening Event Schedule page...")
             async with page.expect_popup() as page1_info:
                 await page.get_by_role("link", name="Event Schedule(Lite)").click()
 
             page1 = await page1_info.value
             await asyncio.sleep(2)
 
-            logger.debug(f"Setting date range: {start_time} - {end_time}")
+            logger.info(f"Setting date range: {start_time} - {end_time}")
             await page1.locator("#gameDateFromTo").click()
             await asyncio.sleep(2)
-            await page1.locator("#gameDateFromTo").fill(f"{start_time} - {end_time}")
+            await page1.locator("#gameDateFromTo").fill(f"{start_time} - {start_time}")
             await page1.locator("#gameDateFromTo").press("Enter")
             await asyncio.sleep(2)
 
-            logger.debug("Applying date filter...")
+            logger.info("Applying date filter...")
             await page1.get_by_role("button", name="Apply").click()
             await asyncio.sleep(3)
 
-            logger.debug("Starting search...")
+            logger.info("Starting search...")
             await page1.get_by_role("button", name="28 selected").click()
             await page1.get_by_role("checkbox", name="All", exact=True).check()
+            logger.info("Selecting leagues groups...")
+            logger.info(f"Leagues groups: {leagues_groups}")
             for leagues_group in leagues_groups:
                 await page1.get_by_role(
                     "checkbox", name=leagues_group, exact=True
@@ -130,8 +152,24 @@ async def download_infosite_data(
     async def run(playwright: Playwright) -> str:
         try:
             logger.debug("Launching browser for infosite...")
-            browser = await playwright.chromium.launch(headless=False)
-            context = await browser.new_context(accept_downloads=True)
+
+            # Configure proxy if available
+            launch_options = {"headless": headless}
+            context_options = {"accept_downloads": True}
+
+            if http_proxy or https_proxy:
+                proxy_config = {}
+                if http_proxy:
+                    proxy_config["server"] = http_proxy
+                    logger.info(f"Using HTTP proxy: {http_proxy}")
+                elif https_proxy:
+                    proxy_config["server"] = https_proxy
+                    logger.info(f"Using HTTPS proxy: {https_proxy}")
+
+                context_options["proxy"] = proxy_config
+
+            browser = await playwright.chromium.launch(**launch_options)
+            context = await browser.new_context(**context_options)
             page = await context.new_page()
 
             logger.debug("Navigating to infosite login page...")

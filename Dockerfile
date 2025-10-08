@@ -1,4 +1,4 @@
-FROM python:3.12-slim AS base
+FROM python:3.12-slim
 
 RUN apt-get update && apt-get install -y \
     xvfb \
@@ -13,27 +13,22 @@ RUN apt-get update && apt-get install -y \
     libx11-xcb1 \
     && rm -rf /var/lib/apt/lists/*
 
+
+# install playwright
 RUN pip install --upgrade pip
-
-FROM base AS dependencies
-
 COPY requirements.txt .
+RUN pip install -r requirements.txt
+RUN playwright install --with-deps
 
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install -r requirements.txt
 
-RUN --mount=type=cache,target=/root/.cache/ms-playwright \
-    playwright install --with-deps
-
-FROM dependencies AS application
-
+COPY . /app
 WORKDIR /app
 
-COPY . .
+# Ensure formula.xlsx is copied to the correct location
+COPY data/formula.xlsx /app/data/formula.xlsx
 
-RUN mkdir -p /app/data/iptv/original /app/data/iptv/processed /app/logs
+RUN mkdir -p /app/data/iptv/original /app/data/iptv/processed /app/logs /app/data/infosite /app/data/merge
 
-EXPOSE 5000
-
+# API Service
 CMD xvfb-run --auto-servernum --server-args='-screen 0 1280x720x24' \
     uvicorn main:app --host 0.0.0.0 --port 5000

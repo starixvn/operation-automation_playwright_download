@@ -21,6 +21,7 @@ from utils.processing import (
     merge_data_to_excel,
     processing_iptv_json,
 )
+from config.env_config import config
 from pathlib import Path
 import asyncio
 import shutil
@@ -274,8 +275,14 @@ async def download_iptv_endpoint(request: IptvRequest):
 #     )
 
 
+
+
 if __name__ == "__main__":
     import uvicorn
 
-    logger.info("Starting IPTV API server...")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    host = config.get("API_HOST", "0.0.0.0")
+    port = config.get_int("API_PORT", 8000)
+    log_level = config.get("LOG_LEVEL", "INFO")
+
+    logger.info(f"Starting IPTV API server on {host}:{port}...")
+    uvicorn.run(app, host=host, port=port)
