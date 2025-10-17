@@ -17,6 +17,8 @@ async def processing_iptv(filename: str, start_date: str, end_date: str):
             engine="python",
             quotechar='"',
             on_bad_lines="skip",
+            encoding="cp1258",
+            encoding_errors="replace"
         )
         logger.debug(f"Loaded {len(df)} records from {filename}")
 
@@ -29,7 +31,7 @@ async def processing_iptv(filename: str, start_date: str, end_date: str):
 
         # 异步保存处理后的文件
         output_filename = f"./data/iptv/processed/processed_{filename}"
-        await asyncio.to_thread(df.to_csv, output_filename, index=False)
+        await asyncio.to_thread(df.to_csv, output_filename, index=False, encoding="utf-8-sig")
 
         logger.info(f"Successfully processed {filename}, output: {output_filename}")
         return df
@@ -50,14 +52,14 @@ def _process_dataframe(
     df = df[df["Sport"] == "Soccer"]
 
     # 处理日期过滤
-    df["StartDate"] = pd.to_datetime(df["Start Date"])+pd.Timedelta(hours=8)
+    df["StartDate"] = pd.to_datetime(df["Start Date"])+pd.Timedelta(hours=7)
     df = df[df["StartDate"] >= pd.to_datetime(f"{start_date} 12:00PM", format="%d/%m/%Y %I:%M%p")]
     df = df[df["StartDate"] <= pd.to_datetime(f"{end_date} 11:59AM", format="%d/%m/%Y %I:%M%p")]
     df["Start Date"] = df["StartDate"].dt.strftime("%m/%d/%Y %I:%M %p")
 
     # 删除临时的StartDate列
     df.drop(columns=["StartDate"], inplace=True)
-
+    df = df.drop_duplicates()
     return df
 
 
