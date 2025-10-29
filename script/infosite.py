@@ -84,7 +84,7 @@ async def get_league_names(
             await asyncio.sleep(3)
 
             logger.info("Starting search...")
-            await page1.get_by_role("button", name="28 selected").click()
+            await page1.get_by_role("button").filter(has_text="selected").click()
             await page1.get_by_role("checkbox", name="All", exact=True).check()
             logger.info("Selecting leagues groups...")
             logger.info(f"Leagues groups: {leagues_groups}")
@@ -195,7 +195,7 @@ async def download_infosite_data(
             logger.debug(f"Setting date range: {start_time} - {end_time}")
             await page1.locator("#gameDateFromTo").click()
             await asyncio.sleep(2)
-            await page1.locator("#gameDateFromTo").fill(f"{start_time} - {end_time}")
+            await page1.locator("#gameDateFromTo").fill(f"{start_time} - {start_time}")
             await page1.locator("#gameDateFromTo").press("Enter")
             await asyncio.sleep(2)
 
