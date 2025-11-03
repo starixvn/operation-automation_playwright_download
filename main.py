@@ -1,7 +1,10 @@
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.responses import FileResponse
 from datetime import datetime
-from script.iptv import download_schedule  # 假设你有这个函数
+from script.iptv import (
+    download_schedule,
+    login_and_get_token,
+)  # 假设你有这个函数
 from script.infosite import download_infosite_data, get_league_names
 from schema.schema import (
     IptvRequest,
@@ -10,12 +13,13 @@ from schema.schema import (
     InfositeResponse,
     MergeRequest,
     CheckLeaguesRequest,
-    CheckLeaguesResponse
+    CheckLeaguesResponse,
 )
 from utils.logger import logger
 from utils.processing import (
     processing_iptv,
     merge_data_to_excel,
+    processing_iptv_json,
 )
 from pathlib import Path
 import asyncio
@@ -54,25 +58,14 @@ async def download_iptv_endpoint(request: IptvRequest):
 
         logger.debug(f"Processing dates: {start_date} to {end_date}")
 
-        # 生成文件名（如果没有提供）
-        if not request.filename:
-            filename = f"schedule_{start_date.replace('/', '')}_to_{end_date.replace('/', '')}.csv"
-        else:
-            filename = request.filename
-
-        logger.info(f"Starting download for file: {filename}")
-
-        # 调用下载函数
-        await download_schedule(start_date, end_date, filename)
-        await processing_iptv(filename, start_date, end_date)
-
-        logger.info(f"Schedule downloaded successfully: {filename}")
+        token, device_uuid = await login_and_get_token()
+        df = await download_schedule(start_date, end_date, token, device_uuid)
+        df_json = await processing_iptv_json(df)
 
         return IptvResponse(
             success=True,
             message="IPTV downloaded successfully",
-            filename=f"./data/iptv/processed/processed_{filename}",
-            download_time=datetime.now(),
+            data=df_json,
         )
     except Exception as e:
         logger.error(f"Error downloading schedule: {str(e)}", exc_info=True)
@@ -246,6 +239,7 @@ async def list_excel_files():
         logger.error(f"Error listing Excel files: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @app.post("/check-leagues", response_model=CheckLeaguesResponse)
 async def check_leagues_endpoint(request: CheckLeaguesRequest):
     """Check leagues names"""
@@ -259,6 +253,7 @@ async def check_leagues_endpoint(request: CheckLeaguesRequest):
         count=len(leagues),
         leagues=leagues,
     )
+
 
 if __name__ == "__main__":
     import uvicorn

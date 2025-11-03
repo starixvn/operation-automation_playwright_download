@@ -1,19 +1,17 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 
 
 class IptvRequest(BaseModel):
     start_date: str  # 格式: "16/09/2025"
     end_date: str  # 格式: "17/09/2025"
-    filename: Optional[str] = None  # 可选的文件名
 
 
 class IptvResponse(BaseModel):
     success: bool
     message: str
-    filename: Optional[str] = None
-    download_time: datetime
+    data: Optional[List[Dict[str, Any]]] = None
 
 
 class InfositeRequest(BaseModel):
@@ -40,10 +38,12 @@ class MergeRequest(BaseModel):
     infosite_path: str  # infosite CSV文件名
     output_filename: str  # 输出Excel文件名
 
+
 class CheckLeaguesRequest(BaseModel):
     start_time: str  # 格式: "2025-09-16"
     end_time: str  # 格式: "2025-09-17"
     league_groups: list[str]  # 比赛类型列表
+
 
 class CheckLeaguesResponse(BaseModel):
     success: bool

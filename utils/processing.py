@@ -4,6 +4,7 @@ from pathlib import Path
 from utils.logger import logger
 import pandas as pd
 import shutil
+from datetime import datetime, timedelta, timezone
 
 
 ## IPTV 数据处理
@@ -13,12 +14,14 @@ async def processing_iptv(filename: str, start_date: str, end_date: str):
 
     try:
         # 异步读取CSV文件
-        df = await asyncio.to_thread(pd.read_csv, f"./data/iptv/original/{filename}",
+        df = await asyncio.to_thread(
+            pd.read_csv,
+            f"./data/iptv/original/{filename}",
             engine="python",
             quotechar='"',
             on_bad_lines="skip",
             encoding="cp1258",
-            encoding_errors="replace"
+            encoding_errors="replace",
         )
         logger.debug(f"Loaded {len(df)} records from {filename}")
 
@@ -31,7 +34,9 @@ async def processing_iptv(filename: str, start_date: str, end_date: str):
 
         # 异步保存处理后的文件
         output_filename = f"./data/iptv/processed/processed_{filename}"
-        await asyncio.to_thread(df.to_csv, output_filename, index=False, encoding="utf-8-sig")
+        await asyncio.to_thread(
+            df.to_csv, output_filename, index=False, encoding="utf-8-sig"
+        )
 
         logger.info(f"Successfully processed {filename}, output: {output_filename}")
         return df
@@ -52,9 +57,15 @@ def _process_dataframe(
     df = df[df["Sport"] == "Soccer"]
 
     # 处理日期过滤
-    df["StartDate"] = pd.to_datetime(df["Start Date"])+pd.Timedelta(hours=7)
-    df = df[df["StartDate"] >= pd.to_datetime(f"{start_date} 12:00PM", format="%d/%m/%Y %I:%M%p")]
-    df = df[df["StartDate"] <= pd.to_datetime(f"{end_date} 11:59AM", format="%d/%m/%Y %I:%M%p")]
+    df["StartDate"] = pd.to_datetime(df["Start Date"]) + pd.Timedelta(hours=7)
+    df = df[
+        df["StartDate"]
+        >= pd.to_datetime(f"{start_date} 12:00PM", format="%d/%m/%Y %I:%M%p")
+    ]
+    df = df[
+        df["StartDate"]
+        <= pd.to_datetime(f"{end_date} 11:59AM", format="%d/%m/%Y %I:%M%p")
+    ]
     df["Start Date"] = df["StartDate"].dt.strftime("%m/%d/%Y %I:%M %p")
 
     # 删除临时的StartDate列
@@ -91,6 +102,28 @@ async def process_multiple_schedules(filenames: list, start_date: str, end_date:
     except Exception as e:
         logger.error(f"Error in concurrent processing: {str(e)}", exc_info=True)
         raise
+
+
+async def processing_iptv_json(df: pd.DataFrame):
+    """异步处理调度数据"""
+    df = df.rename(
+        columns={
+            "Competition": "leagueName",
+            "Home Team": "homeTeamName",
+            "Away Team": "awayTeamName",
+            "Channel": "channel",
+        }
+    )
+    df["kickoffTime"] = pd.to_datetime(df["Start Date"], errors="coerce").dt.strftime(
+        "%Y-%m-%dT%H:%M:%S.000Z"
+    )
+    df["alive"] = df["Watch"].apply(lambda x: str(x).strip().lower() == "verified")
+    now = datetime.now()
+    df["status"] = pd.to_datetime(df["Start Date"], errors="coerce").apply(
+        lambda t: (now - t) < timedelta(hours=2)
+    )
+    df = df.drop(columns=["Start Date", "Watch", "Information", "Sport", "EventId"])
+    return df.to_dict(orient="records")
 
 
 ## MERGE IPTV and InfoSite into  formula

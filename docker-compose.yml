@@ -5,9 +5,17 @@ services:
     container_name: playwright-vnc
     shm_size: 2gb
     ports:
-      - "8000:8000"   # noVNC 網頁
+      - "8020:8000"   # noVNC 網頁
     volumes:
       - ./:/app # 把錄製的檔案存到本機
     env_file:
       - .env
+    networks:
+      - eventcollecting-network
+
     restart: unless-stopped
+
+networks:
+  eventcollecting-network:
+    external: true
+    name: sql_agent_app-network
