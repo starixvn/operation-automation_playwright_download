@@ -157,7 +157,25 @@ async def download_schedule(
         csv_bytes = await response.body()
 
         # ✅ 解析 DataFrame
-        df = pd.read_csv(io.BytesIO(csv_bytes))
+        try:
+            # 嘗試以標準逗號分隔讀取
+            df = pd.read_csv(
+                io.BytesIO(csv_bytes),
+                on_bad_lines="skip",  # 跳過壞行
+                engine="python",  # 更容忍特殊字元
+                quoting=3,  # QUOTE_NONE，避免錯誤引號
+                encoding_errors="ignore",
+            )
+        except Exception as e:
+            print("⚠️ CSV parse failed, fallback to tab-delimited:", e)
+            # 若 CSV 格式真的亂，嘗試以 tab 再讀一次
+            df = pd.read_csv(
+                io.BytesIO(csv_bytes),
+                sep="\t",
+                on_bad_lines="skip",
+                engine="python",
+                encoding_errors="ignore",
+            )
         logger.info(f"✅ IPTV CSV loaded, rows={len(df)}")
 
         # ✅ 篩選運動類型
