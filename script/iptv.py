@@ -94,7 +94,7 @@ async def login_and_get_token():
         page = await context.new_page()
 
         print("🔐 Navigating to login page...")
-        await page.goto("https://inplayip.tv/login?redirectUrl=/schedule")
+        await page.goto("https://inplayip.tv/login?redirectUrl=/schedule", timeout=120000)
 
         # 填寫登入表單
         await page.get_by_role("textbox", name="Email").fill(email)
@@ -102,7 +102,13 @@ async def login_and_get_token():
         await page.get_by_role("button", name="Sign in", exact=True).click()
 
         # 等待登入完成（可以依實際情況調整）
-        await page.wait_for_load_state("networkidle")
+        #await page.wait_for_load_state("networkidle")
+        try:
+            await page.wait_for_selector("text=Dashboard", timeout=60000)
+        except Exception:
+            await page.wait_for_load_state("domcontentloaded", timeout=60000)
+
+        print("✅ Login success")
 
         # 1️⃣ 從 localStorage 抓 access_token
         token = await page.evaluate(

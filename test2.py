@@ -5,7 +5,7 @@ from utils.processing import processing_iptv, merge_data_to_excel, processing_ip
 import asyncio
 
 start_date = "2025-11-03"
-end_date = "2025-11-04"
+end_date = "2025-11-10"
 
 # asyncio.run(download_schedule(start_date, end_date))
 
@@ -13,8 +13,9 @@ end_date = "2025-11-04"
 async def main():
     token, device_uuid = await login_and_get_token()
     df = await download_schedule(start_date, end_date, token, device_uuid)
-    df = await processing_iptv_json(df)
-    print(type(df))
+    df = await processing_iptv_json(df, start_date, end_date)
+    print(df)
+    #print(df.head(30))
 
 
 # ✅ 只呼叫一次 asyncio.run
