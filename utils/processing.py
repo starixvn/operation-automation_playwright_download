@@ -104,7 +104,7 @@ async def process_multiple_schedules(filenames: list, start_date: str, end_date:
         raise
 
 
-async def processing_iptv_json(df: pd.DataFrame):
+async def processing_iptv_json(df: pd.DataFrame, start_date: str, end_date: str):
     """异步处理调度数据"""
     df = df.rename(
         columns={
@@ -114,6 +114,17 @@ async def processing_iptv_json(df: pd.DataFrame):
             "Channel": "channel",
         }
     )
+    df["StartDate"] = pd.to_datetime(df["Start Date"]) + pd.Timedelta(hours=7)
+    df = df[
+        df["StartDate"]
+        >= pd.to_datetime(f"{start_date} 12:00PM", format="%Y-%m-%d %I:%M%p")
+    ]
+    df = df[
+        df["StartDate"]
+        <= pd.to_datetime(f"{end_date} 11:59AM", format="%Y-%m-%d  %I:%M%p")
+    ]
+    df.drop(columns=["StartDate"], inplace=True)
+    df = df.drop_duplicates(["homeTeamName", "awayTeamName", "Start Date"])
     df["kickoffTime"] = pd.to_datetime(df["Start Date"], errors="coerce").dt.strftime(
         "%Y-%m-%dT%H:%M:%S.000Z"
     )
