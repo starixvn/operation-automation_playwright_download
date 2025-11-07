@@ -139,7 +139,7 @@ async def download_schedule(
         params = {
             "startDate": start_date,
             "endDate": end_date,
-            "timezoneOffset": "-480",
+            "timezoneOffset": "0",
         }
 
         headers = {

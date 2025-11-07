@@ -131,7 +131,7 @@ async def processing_iptv_json(df: pd.DataFrame, start_date: str, end_date: str)
     df["alive"] = df["Watch"].apply(lambda x: str(x).strip().lower() == "verified")
     now = datetime.now()
     df["status"] = pd.to_datetime(df["Start Date"], errors="coerce").apply(
-        lambda t: (now - t) < timedelta(hours=2)
+        lambda t: timedelta(0) <= (now - t) < timedelta(hours=2)
     )
     df = df.drop(columns=["Start Date", "Watch", "Information", "Sport"])
     return df.to_dict(orient="records")

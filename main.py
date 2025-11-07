@@ -45,6 +45,22 @@ async def root():
     return {"message": "IPTV Schedule API"}
 
 
+TOKEN_FILE = "./token.json"
+
+
+@app.get("/login")
+async def login():
+    token, device_uuid = await login_and_get_token()
+    with open(TOKEN_FILE, "w", encoding="utf-8") as f:
+        json.dump(
+            {"token": token, "device_uuid": device_uuid},
+            f,
+            ensure_ascii=False,
+            indent=2,
+        )
+    return {"token": token, "device_uuid": device_uuid}
+
+
 @app.post("/download-iptv", response_model=IptvResponse)
 async def download_iptv_endpoint(request: IptvRequest):
     logger.info(
@@ -58,7 +74,11 @@ async def download_iptv_endpoint(request: IptvRequest):
 
         logger.debug(f"Processing dates: {start_date} to {end_date}")
 
-        token, device_uuid = await login_and_get_token()
+        # token, device_uuid = await login_and_get_token()
+        with open(TOKEN_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+            token = data.get("token")
+            device_uuid = data.get("device_uuid")
         df = await download_schedule(start_date, end_date, token, device_uuid)
         df_json = await processing_iptv_json(df, start_date, end_date)
 
