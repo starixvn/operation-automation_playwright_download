@@ -94,7 +94,7 @@ async def login_and_get_token():
         page = await context.new_page()
 
         print("🔐 Navigating to login page...")
-        await page.goto("https://inplayip.tv/login?redirectUrl=/schedule")
+        await page.goto("https://inplayip.tv/login?redirectUrl=/schedule",timeout=120000)
 
         # 填寫登入表單
         await page.get_by_role("textbox", name="Email").fill(email)
