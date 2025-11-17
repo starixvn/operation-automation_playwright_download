@@ -110,8 +110,20 @@ async def download_schedule_backup(start_date: str, end_date: str):
 
 async def login_and_get_token():
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
-        context = await browser.new_context()
+        browser = await p.chromium.launch(headless=headless)
+
+        context_options = {}
+        if http_proxy or https_proxy:
+            proxy_config = {}
+            if http_proxy:
+                proxy_config["server"] = http_proxy
+                logger.info(f"Using HTTP proxy: {http_proxy}")
+            elif https_proxy:
+                proxy_config["server"] = https_proxy
+                logger.info(f"Using HTTPS proxy: {https_proxy}")
+            context_options["proxy"] = proxy_config
+
+        context = await browser.new_context(**context_options)
         page = await context.new_page()
 
         print("🔐 Navigating to login page...")
@@ -154,7 +166,17 @@ async def download_schedule(date: str, token: str, device_uuid: str):
         print(f"[INFO] Downloading IPTV schedule table: {date}")
 
         browser = await p.chromium.launch(headless=True)
-        context = await browser.new_context()
+        context_options = {}
+        if http_proxy or https_proxy:
+            proxy_config = {}
+            if http_proxy:
+                proxy_config["server"] = http_proxy
+                logger.info(f"Using HTTP proxy: {http_proxy}")
+            elif https_proxy:
+                proxy_config["server"] = https_proxy
+                logger.info(f"Using HTTPS proxy: {https_proxy}")
+            context_options["proxy"] = proxy_config
+        context = await browser.new_context(**context_options)
         page = await context.new_page()
 
         url = "https://api.inplayip.tv/api/schedule/table"
