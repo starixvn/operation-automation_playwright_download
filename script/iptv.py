@@ -194,7 +194,7 @@ async def download_schedule(date: str, token: str, device_uuid: str):
             "verified",
         ]
         data = data[columns]
-
+        print(data["sport"].unique())
         # print(f"[INFO] Loaded schedule table, items={len(data.get('items', []))}")
 
         await browser.close()

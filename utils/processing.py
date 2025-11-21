@@ -134,7 +134,6 @@ async def processing_iptv_json(df: pd.DataFrame, start_date: str, end_date: str)
         "%Y-%m-%dT%H:%M:%S.000Z"
     )
     now = datetime.now()
-    print(df.columns)
     df["status"] = pd.to_datetime(df["End Date"], errors="coerce").apply(
         lambda t: True if now < t else False
     )
