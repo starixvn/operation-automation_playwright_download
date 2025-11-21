@@ -115,7 +115,7 @@ async def processing_iptv_json(df: pd.DataFrame, start_date: str, end_date: str)
             "Channel": "channel",
             "startTime": "Start Date",
             "endTime": "End Date",
-            "verified": "alive",
+            "cancelled": "alive",
         }
     )
     df["StartDate"] = pd.to_datetime(df["Start Date"]) + pd.Timedelta(hours=7)
@@ -133,11 +133,12 @@ async def processing_iptv_json(df: pd.DataFrame, start_date: str, end_date: str)
     df["kickoffTime"] = pd.to_datetime(df["Start Date"], errors="coerce").dt.strftime(
         "%Y-%m-%dT%H:%M:%S.000Z"
     )
+    df["alive"] = df["alive"].apply(lambda x: True if x == False else False)
     now = datetime.now()
     df["status"] = pd.to_datetime(df["End Date"], errors="coerce").apply(
         lambda t: True if now < t else False
     )
-    df = df.drop(columns=["Start Date", "sport", "cancelled", "End Date", "region"])
+    df = df.drop(columns=["Start Date", "sport", "End Date", "region"])
     return df.to_dict(orient="records")
 
 
