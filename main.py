@@ -79,9 +79,9 @@ async def download_iptv_endpoint(request: IptvRequest):
             data = json.load(f)
             token = data.get("token")
             device_uuid = data.get("device_uuid")
-        df = await download_schedule(start_date, end_date, token, device_uuid)
+        df = await download_schedule(start_date, token, device_uuid)
         df_json = await processing_iptv_json(df, start_date, end_date)
-
+        print(df_json)
         return IptvResponse(
             success=True,
             message="IPTV downloaded successfully",

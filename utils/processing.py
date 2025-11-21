@@ -106,12 +106,16 @@ async def process_multiple_schedules(filenames: list, start_date: str, end_date:
 
 async def processing_iptv_json(df: pd.DataFrame, start_date: str, end_date: str):
     """异步处理调度数据"""
+    print(df.columns)
     df = df.rename(
         columns={
-            "Competition": "leagueName",
-            "Home Team": "homeTeamName",
-            "Away Team": "awayTeamName",
+            "competition": "leagueName",
+            "competitor1": "homeTeamName",
+            "competitor2": "awayTeamName",
             "Channel": "channel",
+            "startTime": "Start Date",
+            "endTime": "End Date",
+            "verified": "alive",
         }
     )
     df["StartDate"] = pd.to_datetime(df["Start Date"]) + pd.Timedelta(hours=7)
@@ -123,17 +127,18 @@ async def processing_iptv_json(df: pd.DataFrame, start_date: str, end_date: str)
         df["StartDate"]
         <= pd.to_datetime(f"{end_date} 11:59AM", format="%Y-%m-%d  %I:%M%p")
     ]
+    df["leagueName"] = df["region"] + " " + df["leagueName"]
     df.drop(columns=["StartDate"], inplace=True)
     df = df.drop_duplicates(["homeTeamName", "awayTeamName", "Start Date"])
     df["kickoffTime"] = pd.to_datetime(df["Start Date"], errors="coerce").dt.strftime(
         "%Y-%m-%dT%H:%M:%S.000Z"
     )
-    df["alive"] = df["Watch"].apply(lambda x: str(x).strip().lower() == "verified")
     now = datetime.now()
-    df["status"] = pd.to_datetime(df["Start Date"], errors="coerce").apply(
-        lambda t: True if (now - t) < timedelta(hours=2) else False
+    print(df.columns)
+    df["status"] = pd.to_datetime(df["End Date"], errors="coerce").apply(
+        lambda t: True if now < t else False
     )
-    df = df.drop(columns=["Start Date", "Watch", "Information", "Sport"])
+    df = df.drop(columns=["Start Date", "sport", "cancelled", "End Date", "region"])
     return df.to_dict(orient="records")
 
 
