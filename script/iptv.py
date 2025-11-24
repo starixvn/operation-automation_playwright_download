@@ -190,6 +190,7 @@ async def download_schedule(date: str, token: str, device_uuid: str):
             "competitor2",
             "startTime",
             "endTime",
+            "channel",
             "cancelled",
             "verified",
         ]
